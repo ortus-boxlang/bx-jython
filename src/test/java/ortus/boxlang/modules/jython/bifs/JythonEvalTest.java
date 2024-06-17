@@ -1,21 +1,23 @@
-package ortus.boxlang.moduleslug.components;
+package ortus.boxlang.modules.jython.bifs;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
+
+import javax.script.ScriptEngine;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import ortus.boxlang.compiler.parser.BoxSourceType;
 import ortus.boxlang.runtime.BoxRuntime;
 import ortus.boxlang.runtime.context.IBoxContext;
 import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
 import ortus.boxlang.runtime.scopes.IScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.scopes.VariablesScope;
+import ortus.boxlang.runtime.types.IStruct;
 
-public class ExampleComponentTest {
+public class JythonEvalTest {
 
 	static BoxRuntime	instance;
 	IBoxContext			context;
@@ -33,14 +35,17 @@ public class ExampleComponentTest {
 		variables	= context.getScopeNearby( VariablesScope.name );
 	}
 
-	@DisplayName( "It can test the ExampleComponent" )
+	@DisplayName( "It can test the jython BIF" )
 	@Test
-	public void testExampleComponent() {
+	public void testExampleBIF() {
+		// @formatter:off
 		instance.executeSource( """
-		                        	<cfExampleComponent name="Ortus Solutions">
-		                        	<cfset result = getBoxContext().getBuffer().toString()>
-		                        """, context, BoxSourceType.CFTEMPLATE );
-		assertTrue( variables.getAsString( result ).contains( "Hello, world - from Ortus Solutions." ) );
+			result = JythonEval( "area = 17.68" )
+		""", context );
+		// @formatter:on
+		IStruct			result	= variables.getAsStruct( Key.result );
+		ScriptEngine	engine	= ( ScriptEngine ) result.get( "engine" );
+		assertThat( engine.get( "area" ) ).isEqualTo( 17.68 );
 	}
 
 }

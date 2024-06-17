@@ -15,57 +15,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ortus.boxlang.moduleslug.components;
+package ortus.boxlang.modules.jython.components;
 
 import java.util.Set;
 
+import ortus.boxlang.modules.jython.JythonEngine;
 import ortus.boxlang.runtime.components.Attribute;
 import ortus.boxlang.runtime.components.BoxComponent;
 import ortus.boxlang.runtime.components.Component;
 import ortus.boxlang.runtime.context.IBoxContext;
+import ortus.boxlang.runtime.dynamic.ExpressionInterpreter;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.IStruct;
 import ortus.boxlang.runtime.validation.Validator;
 
-@BoxComponent( allowsBody = false )
-public class ExampleComponent extends Component {
+@BoxComponent( allowsBody = true, requiresBody = true )
+public class Jython extends Component {
 
-	static Key	locationKey	= Key.of( "location" );
-	static Key	shoutKey	= Key.of( "shout" );
-
-	public ExampleComponent() {
+	public Jython() {
 		super();
 		declaredAttributes = new Attribute[] {
-		    new Attribute( Key._NAME, "string", Set.of( Validator.REQUIRED ) ),
-		    new Attribute( locationKey, "string", "world", Set.of( Validator.REQUIRED, Validator.valueOneOf( "world", "universe" ) ) ),
-		    new Attribute( shoutKey, "boolean", false, Set.of( Validator.REQUIRED ) ),
+		    new Attribute( Key.variable, "string", Set.of( Validator.REQUIRED, Validator.NON_EMPTY ) )
 		};
 	}
 
 	/**
-	 * An example component that says hello
+	 * A component to execute python code in the Jython engine
 	 *
 	 * @param context        The context in which the Component is being invoked
 	 * @param attributes     The attributes to the Component
 	 * @param body           The body of the Component
 	 * @param executionState The execution state of the Component
 	 *
-	 * @attribute.name The name of the person greeting us.
+	 * @attribute.variable The variable to store the result in
 	 *
-	 * @attribute.location The location of the person.
-	 *
-	 * @attribute.shout Whether the person is shouting or not.
-	 *
+	 * @return The result is a struct of: <code>engine, globalScope, engineScope</code>
 	 */
 	public BodyResult _invoke( IBoxContext context, IStruct attributes, ComponentBody body, IStruct executionState ) {
-		String			name		= attributes.getAsString( Key._NAME );
-		String			location	= attributes.getAsString( locationKey );
-		Boolean			shout		= attributes.getAsBoolean( shoutKey );
+		StringBuffer	buffer		= new StringBuffer();
+		BodyResult		bodyResult	= processBody( context, body, buffer );
 
-		StringBuilder	sb			= new StringBuilder();
-		String			greeting	= sb.append( "Hello, " ).append( location ).append( " - from " ).append( name ).append( "." ).toString();
-		context.writeToBuffer( shout ? greeting.toUpperCase() : greeting );
+		// IF there was a return statement inside our body, we early exit now
+		if ( bodyResult.isEarlyExit() ) {
+			// A return statement inside of savecontent discards all output that was built up
+			return bodyResult;
+		}
+		// Get the content of the body
+		String	content			= buffer.toString();
+		String	variableName	= attributes.getAsString( Key.variable );
 
+		// Execute the script
+		IStruct	result			= JythonEngine.eval( context, content );
+
+		// Set the result back into the page
+		ExpressionInterpreter.setVariable( context, variableName, result );
 		return DEFAULT_RETURN;
 	}
+
 }

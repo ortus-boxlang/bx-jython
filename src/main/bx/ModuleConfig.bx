@@ -36,7 +36,7 @@ class {
 	 * The BoxLang mapping for your module.  All BoxLang modules are registered with an internal
 	 * mapping prefix of : bxModules.{this.mapping}, /bxmodules/{this.mapping}. Ex: bxModules.test, /bxmodules/test
 	 */
-	this.mapping = "test";
+	this.mapping = "jython";
 
 	/**
 	 * Who built the module
@@ -72,8 +72,6 @@ class {
 		 * Every module has a settings configuration object
 		 */
 		settings = {
-			loadedOn : now(),
-			loadedBy : "Luis Majano"
 		};
 
 		/**
@@ -101,17 +99,12 @@ class {
 		 * The module interceptors to register into the runtime
 		 */
 		interceptors = [
-			// { class="path.to.Interceptor", properties={} }
-			{ class : "#moduleRecord.invocationPath#.interceptors.Listener", properties : {
-				createdOn : now(),
-				by : "Luis Majano"
-			} }
 		];
 
 		/**
 		 * A list of custom interception points to register into the runtime
 		 */
-		customInterceptionPoints = [ "onBxTestModule" ];
+		customInterceptionPoints = [ ];
 	}
 
 	/**
@@ -136,7 +129,4 @@ class {
 	 * that match the approved runtime interception points
 	 */
 
-	 function afterModuleActivations(){
-		// do something
-	 }
 }

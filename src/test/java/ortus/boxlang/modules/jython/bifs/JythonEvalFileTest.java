@@ -1,6 +1,8 @@
-package ortus.boxlang.moduleslug.bifs;
+package ortus.boxlang.modules.jython.bifs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
+
+import javax.script.ScriptEngine;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,8 +15,9 @@ import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
 import ortus.boxlang.runtime.scopes.IScope;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.scopes.VariablesScope;
+import ortus.boxlang.runtime.types.IStruct;
 
-public class ExampleJavaBIFTest {
+public class JythonEvalFileTest {
 
 	static BoxRuntime	instance;
 	IBoxContext			context;
@@ -32,11 +35,17 @@ public class ExampleJavaBIFTest {
 		variables	= context.getScopeNearby( VariablesScope.name );
 	}
 
-	@DisplayName( "It can test the ExampleBIF" )
+	@DisplayName( "It can test the jython BIF" )
 	@Test
 	public void testExampleBIF() {
-		instance.executeSource( "result = ExampleJavaBIF()", context );
-		assertEquals( "Hello from an ExampleJavaBIF!", variables.get( result ) );
+		// @formatter:off
+		instance.executeSource( """
+			result = JythonEvalFile( "src/test/resources/python/Test.py" )
+		""", context );
+		// @formatter:on
+		IStruct			result	= variables.getAsStruct( Key.result );
+		ScriptEngine	engine	= ( ScriptEngine ) result.get( "engine" );
+		assertThat( engine.get( "result" ) ).isEqualTo( 8 );
 	}
 
 }
