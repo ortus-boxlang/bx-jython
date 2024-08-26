@@ -8,7 +8,7 @@ plugins {
 	// For building shadow jars with jdk 17 ONLY
     //id 'com.github.johnrengelman.shadow' version '8.1.1'
     // For building shadow jars using JDK 21 +, they had to fork
-    id "io.github.goooler.shadow" version "8.1.7"
+    id "io.github.goooler.shadow" version "8.1.8"
     // Download task
     id "de.undercouch.download" version "5.6.0"
 }
@@ -22,6 +22,12 @@ ext {
 	buildID = System.getenv( 'BUILD_ID' ) ?: '0'
 	branch = System.getenv( 'BRANCH' ) ?: 'development'
 }
+if ( branch == 'development' ) {
+    // If the branch is 'development', ensure the version ends with '-snapshot'
+    // This replaces any existing prerelease identifier with '-snapshot'
+    version = version.contains('-') ? version.replaceAll(/-.*/, '-snapshot') : "${version}-snapshot"
+	boxlangVersion = boxlangVersion.contains('-') ? boxlangVersion.replaceAll(/-.*/, '-snapshot') : "${boxlangVersion}-snapshot"
+}
 
 repositories {
     mavenLocal()
@@ -32,10 +38,12 @@ dependencies {
 	// Until BoxLang is published to Maven Central
 	// Look for it in the local build directory
 	// You must run `./gradle build -x test` in the BoxLang project
+    compileOnly files( '../../boxlang/build/distributions/boxlang-' + boxlangVersion + '-all.jar' )
     compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '-all.jar' )
-	implementation 'org.python:jython-slim:2.7.3'
+	implementation 'org.python:jython-slim:2.7.4'
 
     // Testing Dependencies
+    testImplementation files( '../../boxlang/build/distributions/boxlang-' + boxlangVersion + '-all.jar' )
 	testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '-all.jar' )
     testImplementation "org.junit.jupiter:junit-jupiter:5.+"
 	testImplementation "org.mockito:mockito-core:5.+"
