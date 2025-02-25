@@ -38,7 +38,7 @@ import ortus.boxlang.runtime.util.FileSystemUtil;
 
 public class JythonEngine {
 
-	private static final ScriptEngineManager SCRIPT_MANAGER = new ScriptEngineManager();
+	private static final ScriptEngineManager SCRIPT_MANAGER = new ScriptEngineManager(JythonEngine.class.getClassLoader());
 
 	public static IStruct eval( IBoxContext context, String script ) {
 		ScriptEngine	jython		= SCRIPT_MANAGER.getEngineByName( "jython" );
