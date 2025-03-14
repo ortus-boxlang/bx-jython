@@ -3,13 +3,13 @@
 	"version": "@build.version@+@build.number@",
 	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-jython/@build.version@/bx-jython-@build.version@.zip",
 	"author": "Ortus Solutions",
-	"homepage": "https://github.com/boxlang-modules/bx-jython",
-	"documentation": "https://github.com/boxlang-modules/bx-jython",
+	"homepage": "https://github.com/ortus-boxlang/bx-jython",
+	"documentation": "https://github.com/ortus-boxlang/bx-jython",
 	"repository": {
 		"type": "git",
-		"URL": "https://github.com/boxlang-modules/bx-jython"
+		"URL": "https://github.com/ortus-boxlang/bx-jython"
 	},
-	"bugs": "https://github.com/boxlang-modules/bx-jython/issues",
+	"bugs": "https://github.com/ortus-boxlang/bx-jython/issues",
 	"slug": "bx-jython",
 	"shortDescription": "Module template for BoxLang modules",
 	"type": "boxlang-modules",
